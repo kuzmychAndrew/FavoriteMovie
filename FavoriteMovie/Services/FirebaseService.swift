@@ -8,32 +8,32 @@
 import Foundation
 import Firebase
 protocol FirebaseServiceProtocol{
-    func saveMovie(name: String, year: String)
-    func readMovie(completion: @escaping([String])->())
+    func saveMovie(movie: MovieModel)
+    func readMovie(completion: @escaping([FirebaseModel])->())
 }
 
 
 final class FirebaseService: FirebaseServiceProtocol{
     private let ref = Database.database().reference(withPath: "movies")
     private var refObserver: [DatabaseHandle] = []
-    var movies: [String] = []
+    var movies:Set <String> = []
     
-    func saveMovie(name: String, year: String){
-        var movie = "\(name + year)"
-        let movieItem = FirebaseModel(movie: movie)
+    func saveMovie(movie: MovieModel){
+        var movieID = "\(movie.movie + movie.year)"
+        let movieItem = FirebaseModel(movie: movie.movie, year: movie.year)
         
-        let movieItemRef = self.ref.child(movie.lowercased())
+        let movieItemRef = self.ref.child(movieID.lowercased())
         movieItemRef.setValue(movieItem.toAnyObject())
-        print(movie)
+        print(movieID)
     }
-    func readMovie(completion: @escaping([String])->()){
+    func readMovie(completion: @escaping([FirebaseModel])->()){
         let completed = ref.observe(.value){ snapshot in
-        var newMovie:[String] = []
+        var newMovie:[FirebaseModel] = []
         for child in snapshot.children {
             if
               let snapshot = child as? DataSnapshot,
               let movies = FirebaseModel(snapshot: snapshot) {
-                newMovie.append(movies.movie)
+                newMovie.append(movies)
             }
           }
             completion(newMovie)

@@ -14,12 +14,12 @@ final class ViewModel{
         self.firebaseService = firebaseService
     }
     
-    func writeMovie(name: String, year:String){
-        firebaseService.saveMovie(name: name, year: year)
+    func writeMovie(movie: MovieModel){
+        firebaseService.saveMovie(movie: movie)
     }
     
-    func readMovie(completion: @escaping([String])->()){
-        var movies:[String] = []
+    func readMovie(completion: @escaping([FirebaseModel])->()){
+        var movies:[FirebaseModel] = []
         firebaseService.readMovie{ (newMovie) in
             movies =  newMovie
             }
