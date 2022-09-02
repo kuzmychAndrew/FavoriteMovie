@@ -43,12 +43,4 @@ struct FirebaseModel: Hashable{
 }
 
 
-struct MovieModel: Hashable{
-    let movie: String
-    let year: String
-    
-    init(movie: String, year: String) {
-        self.movie = movie
-        self.year = year
-      }
-}
+

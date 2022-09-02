@@ -14,8 +14,16 @@ final class ViewModel{
         self.firebaseService = firebaseService
     }
     
-    func writeMovie(movie: MovieModel){
-        firebaseService.saveMovie(movie: movie)
+    func writeMovie(movie: FirebaseModel, comletion: @escaping(Bool) ->()){
+        var checkVM = false
+        firebaseService.saveMovie(movie: movie,comletion: { (check) in
+            checkVM = check
+            print("\(checkVM) view model")
+            comletion(checkVM)
+
+        })
+        
+                
     }
     
     func readMovie(completion: @escaping([FirebaseModel])->()){

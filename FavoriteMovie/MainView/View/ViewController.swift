@@ -47,38 +47,27 @@ final class ViewController: UIViewController {
             let name = mainView.nameOfMovie.text,
             let year = mainView.yearOfMovie.text
         else{return}
-        var movieList = convertToMovieModel(array: cellText)
-        var movieItem = MovieModel.init(movie: name, year: year)
-        
-        if movieList.contains(movieItem){
-            print("error")
-            let alert = UIAlertController(title: "Error", message: "This movie is already in your lis", preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
-            present(alert, animated: true)
-            mainView.nameOfMovie.text = ""
-            mainView.yearOfMovie.text = ""
+        var movieItem = FirebaseModel(movie: name, year: year)
+        viewModel.writeMovie(movie: movieItem, comletion:{  (checkVM) in
+            if checkVM == true{
+                print("error")
+                let alert = UIAlertController(title: "Error", message: "This movie is already in your lis", preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
+                self.present(alert, animated: true)
+                self.mainView.nameOfMovie.text = ""
+                self.mainView.yearOfMovie.text = ""
 
-        }else{
-            viewModel.writeMovie(movie: movieItem)
-            mainView.nameOfMovie.text = ""
-            mainView.yearOfMovie.text = ""
-            self.cellText.append(FirebaseModel(movie: name, year: year, key: ""))
-            self.mainView.tableView.beginUpdates()
-            self.mainView.tableView.insertRows(at: [IndexPath.init(row: self.cellText.count-1, section: 0)], with: .automatic)
-            self.mainView.tableView.endUpdates()
-            
-            
-        }
-
+            }else{
+    
+                self.mainView.nameOfMovie.text = ""
+                self.mainView.yearOfMovie.text = ""
+                self.cellText.append(movieItem)
+                self.mainView.tableView.beginUpdates()
+                self.mainView.tableView.insertRows(at: [IndexPath.init(row: self.cellText.count-1, section: 0)], with: .automatic)
+                self.mainView.tableView.endUpdates()
+            }
+        })
     }
-    func convertToMovieModel(array: [FirebaseModel]) -> [MovieModel]{
-       var result = [MovieModel]()
-        for i in array{
-            result.append(MovieModel(movie: i.movie, year: i.year))
-        }
-        return result
-    }
-
 }
 
 extension ViewController: UITableViewDelegate, UITableViewDataSource{

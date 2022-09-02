@@ -8,7 +8,7 @@
 import Foundation
 import Firebase
 protocol FirebaseServiceProtocol{
-    func saveMovie(movie: MovieModel)
+    func saveMovie(movie: FirebaseModel, comletion: @escaping(Bool) -> ())
     func readMovie(completion: @escaping([FirebaseModel])->())
 }
 
@@ -18,13 +18,29 @@ final class FirebaseService: FirebaseServiceProtocol{
     private var refObserver: [DatabaseHandle] = []
     var movies:Set <String> = []
     
-    func saveMovie(movie: MovieModel){
+    func saveMovie(movie: FirebaseModel, comletion: @escaping(Bool) -> ()){
+        var check = false
         var movieID = "\(movie.movie + movie.year)"
-        let movieItem = FirebaseModel(movie: movie.movie, year: movie.year)
+        let movieItem = FirebaseModel(movie: movie.movie, year: movie.year, key: movieID)
+        let moviewBD = Database.database().reference().child("movies")
         
-        let movieItemRef = self.ref.child(movieID.lowercased())
-        movieItemRef.setValue(movieItem.toAnyObject())
-        print(movieID)
+        moviewBD.observeSingleEvent(of: .value, with: { (snapshot) in
+            if snapshot.hasChild(movieID.lowercased()){
+                check = true
+                
+                print("\(check) services")
+                print("error")
+                comletion(check)
+            }else{
+                check = false
+                let movieItemRef = self.ref.child(movieID.lowercased())
+                movieItemRef.setValue(movieItem.toAnyObject())
+                print("success")
+                comletion(check)
+                
+            }
+        })
+        print(check)
     }
     func readMovie(completion: @escaping([FirebaseModel])->()){
         let completed = ref.observe(.value){ snapshot in
